@@ -33,6 +33,7 @@ class KinovaGen3VelIKNode():
 
         # IK model
         self.kinova_ik = KinovaGen3IK()
+        self.kinova_ik.visualize()
 
 
     def angles_callback(self, data):

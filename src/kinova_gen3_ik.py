@@ -21,7 +21,8 @@ class KinovaGen3IK():
         self.robot = self.world.robot(0)
         # predefined variables
         self.link = self.robot.link("Tool_Frame")
-        self.home_angles = [0, 0.4, np.pi, -np.pi+1.4, 0, -1, np.pi/2]
+        self.home_angles = [6.036103558670902e-05, 0.26030246722807693, 3.1401042245260427, -2.2700729702394575, -6.433693816010333e-05, 0.9596773373078147, 1.5699166364656643]
+       # self.home_angles = [0,0,0.5,0,0,0,0]
         self.robot.setConfig(self.joint_angles_to_config(self.home_angles))
         # visualize
         vis.add("robot", self.robot)
@@ -89,7 +90,7 @@ class KinovaGen3IK():
 
 
     def solve_ik(self, world_pos, world_rot=None, link=None, local_pos=(0,0,0),
-                 max_iteration=100, tolerance=1e-3):
+                 max_iteration=100, tolerance=1e-10):
         '''Solve IK given a target position, 
            optionally a link and a local position
         '''

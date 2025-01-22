@@ -1,0 +1,6 @@
+<launch>
+  <node name="joy_kinova" pkg="kinova_klampt_ik" type="joy_kinova_klampt.py" output="screen">
+    <param name="dev" value="/dev/input/js0" />
+  </node>
+</launch>
+

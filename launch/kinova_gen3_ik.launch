@@ -1,7 +1,8 @@
 <launch>
-    <!-- IK Solver -->
+    <!-- IK Solver 
     <node name="kinova_gen3_ik" type="kinova_gen3_ik_node.py" 
-          pkg="kinova_klampt_ik" output="screen"/>
+          pkg="kinova_klampt_ik" output="screen"/> -->
+
     <node name="kinova_gen3_vel_ik" type="kinova_gen3_vel_ik_node.py" 
           pkg="kinova_klampt_ik" output="screen">
     </node>

@@ -32,6 +32,7 @@ class KinovaGen3IKNode():
 
         # IK model
         self.kinova_ik = KinovaGen3IK()
+        self.kinova_ik.visualize()
 
 
     def point_callback(self, data):
