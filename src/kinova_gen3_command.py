@@ -3,16 +3,19 @@
 import rospy
 from std_msgs.msg import Float64MultiArray, Float64
 
-
 class KinovaGen3Command():
 
     def __init__(self):
         # ROS
+        
         # subscribe to IK solution
         self.ik_sub = rospy.Subscriber("kinova_gen3_ik/result_config", 
                                         Float64MultiArray, self.ik_callback)
         self.vel_ik_sub = rospy.Subscriber("kinova_gen3_vel_ik/result_config", 
                                         Float64MultiArray, self.vel_ik_callback)
+                                     
+                                       
+
         # publish to Kinova API
         # This will differ depending on the platform you are using Kinova
         # 7 Joints have different topics (Gazebo)
@@ -32,9 +35,11 @@ class KinovaGen3Command():
                                   Float64, queue_size=1)
         self.joint_pubs = [j1_pub, j2_pub, j3_pub, j4_pub, j5_pub, j6_pub, j7_pub]
         # initialize message
-        self.joint_messages = 7 * [Float64()]
-
-
+        self.joint_messages = 7 * [Float64()]   
+        
+        
+        
+    
     def ik_callback(self, data):
         # Get result
         res, angles = data.data[7], data.data[0:7]
@@ -54,8 +59,7 @@ class KinovaGen3Command():
         for i in range(7):
             self.joint_messages[i].data = angles[i]
             self.joint_pubs[i].publish(self.joint_messages[i])
-
-
+            
 if __name__ == "__main__":
     # Launch ros node class
     rospy.init_node('kinova_gen3_command')

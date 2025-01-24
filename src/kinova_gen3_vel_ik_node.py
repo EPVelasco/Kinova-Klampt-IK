@@ -3,14 +3,19 @@
 import rospy
 from geometry_msgs.msg import Pose, Twist
 from std_msgs.msg import String, Float64MultiArray, MultiArrayDimension
+from sensor_msgs.msg import JointState
 from kinova_gen3_ik import KinovaGen3IK
+
+from kortex_driver.msg import Base_JointSpeeds, JointSpeed
 import numpy as np
 
 
+previous_positions = [0.0] * 7
 class KinovaGen3VelIKNode():
 
     def __init__(self):
         # ROS
+        self.robot_name = rospy.get_param('~robot_name', "my_gen3")
         # subscribe to keyboard input
         self.link_sub = rospy.Subscriber("kinova_gen3_vel_ik/set_ik_link", 
                                          String, self.link_callback)
@@ -20,6 +25,11 @@ class KinovaGen3VelIKNode():
                                          Pose, self.pose_callback)
         self.twist_sub = rospy.Subscriber("kinova_gen3_vel_ik/cmd_vel",
                                           Twist, self.vel_callback)
+        self.joint_state_sub = rospy.Subscriber("/my_gen3/joint_states", JointState, self.joint_state_callback)
+        
+        self.joint_velocity_pub = rospy.Publisher('/' + self.robot_name + '/in/joint_velocity', Base_JointSpeeds, queue_size=10)
+        
+
         # publish the control command
         self.res_pub = rospy.Publisher("kinova_gen3_vel_ik/result_config", 
                                        Float64MultiArray, queue_size=1)
@@ -34,11 +44,29 @@ class KinovaGen3VelIKNode():
         # IK model
         self.kinova_ik = KinovaGen3IK()
         self.kinova_ik.visualize()
+        
+        self.joint_positions = [0.0] * 7
+        
+        self.joint_velocities = [0.0] * 7
+        
+      
+    def joint_state_callback(self, msg):
+        global previous_positions
+        """
+        Callback para procesar los datos del topic /joint_state.
+        """
+        # Extraer las posiciones de las articulaciones
+        posiciones = msg.position  # Esto es una lista con las posiciones de las articulaciones
+        self.angles_in = posiciones[1:]
+        self.kinova_ik.set_angles(self.angles_in) 
+        previous_positions = self.angles_in
+        
 
 
     def angles_callback(self, data):
         # Set current angles
         angles = data.data
+        print(angles)
         self.kinova_ik.set_angles(angles)
 
     def pose_callback(self, data):
@@ -68,6 +96,37 @@ class KinovaGen3VelIKNode():
         self.joint_message.data = data
 
         self.res_pub.publish(self.joint_message)
+        #print(angles[:])
+        self.calculate_and_publish_velocities(data)
+
+        
+    def calculate_and_publish_velocities(self, new_positions):
+        global previous_positions
+        """Calculate velocities and publish to Gazebo."""
+        delta_t = 1/30
+        # Calculate joint velocities using finite differences
+        self.joint_velocities = [
+            (new_positions[i] - previous_positions[i]) / delta_t
+            for i in range(7)
+        ]
+       
+        # Update previous positions and time
+        previous_positions = new_positions
+        self.send_joint_speeds(self.joint_velocities)
+
+        
+    def send_joint_speeds(self, speeds):
+        joint_speeds = Base_JointSpeeds()
+        
+        for i in range(len(speeds)):
+            speed = JointSpeed()
+            speed.joint_identifier = i
+            speed.value = speeds[i]
+            speed.duration = 0
+            joint_speeds.joint_speeds.append(speed)
+
+        self.joint_velocity_pub.publish(joint_speeds)
+        
 
 
     def link_callback(self, data):

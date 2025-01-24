@@ -1,4 +1,9 @@
 <launch>
+  
+  <node pkg="joy" type="joy_node" name="joy_node" output="screen">
+        <param name="dev" value="/dev/input/js0"/> <!-- Ruta al dispositivo joystick -->
+  </node>
+  
   <node name="joy_kinova" pkg="kinova_klampt_ik" type="joy_kinova.py" output="screen">
     <param name="dev" value="/dev/input/js0" />
   </node>

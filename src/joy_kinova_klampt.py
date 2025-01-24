@@ -11,10 +11,10 @@ class JoystickRobotController:
     def __init__(self):
         # ROS Publishers
         self.cartesian_pub = rospy.Publisher("/kinova_gen3_vel_ik/cmd_vel", Twist, queue_size=10)
-        self.joint_pub = rospy.Publisher("/terminator/in/joint_velocity", Base_JointSpeeds, queue_size=10)
-        self.clear_faults_pub = rospy.Publisher("/terminator/in/clear_faults", Empty, queue_size=1)
-        self.stop_pub = rospy.Publisher("/terminator/in/stop", Empty, queue_size=1)
-        self.emergency_pub = rospy.Publisher("/terminator/in/emergency_stop", Empty, queue_size=1)
+        self.joint_pub = rospy.Publisher("/my_gen3/in/joint_velocity", Base_JointSpeeds, queue_size=10)
+        self.clear_faults_pub = rospy.Publisher("/my_gen3/in/clear_faults", Empty, queue_size=1)
+        self.stop_pub = rospy.Publisher("/my_gen3/in/stop", Empty, queue_size=1)
+        self.emergency_pub = rospy.Publisher("/my_gen3/in/emergency_stop", Empty, queue_size=1)
 
         # Subscriber to joystick inputs
         self.joy_sub = rospy.Subscriber("/joy", Joy, self.joy_callback)
